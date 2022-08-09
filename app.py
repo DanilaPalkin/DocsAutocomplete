@@ -12,6 +12,8 @@ dictionaryTemplate = { 'AAAA': None, 'BBBB': None, 'CCCC': None, 'DDDD': None, '
             'JJJJ': None, 'KKKK': None, 'LLLL': None, 'MMMM': None, 'NNNN': None, 'OOOO': None, 'PPPP': None, 'QQQQ': None, 'RRRR': None,
             'SSSS': None, 'TTTT': None, 'UUUU': None, 'VVVV': None, 'WWWW': None, 'XXXX': None, 'YYYY': None, 'ZZZZ': None }
 
+docxPath = "" # Нужно что-нибудь с этим придумать
+
 class App(QtWidgets.QMainWindow, layout.Ui_MainWindow):
     def __init__(self):
         super().__init__()
@@ -25,6 +27,8 @@ class App(QtWidgets.QMainWindow, layout.Ui_MainWindow):
         if docxName:
             print(docxName)
             self.label_2.setText(QtCore.QFileInfo(docxName).fileName())
+            global docxPath
+            docxPath = docxName
 
     def browseXlsx(self):
         xlsxName, _ = QtWidgets.QFileDialog.getOpenFileName(self,"Выбрать базу данных", "","Книга Excel (*.xlsx)")
@@ -33,11 +37,11 @@ class App(QtWidgets.QMainWindow, layout.Ui_MainWindow):
             self.label.setText(QtCore.QFileInfo(xlsxName).fileName())
             self.loadExcelData(xlsxName)
 
-    def loadExcelData(self, fileName):
+    def loadExcelData(self, xlsxName):
         #df = pd.read_excel(fileName, QtCore.QFileInfo(fileName).fileName())
-        xl = pd.ExcelFile(fileName)
+        xl = pd.ExcelFile(xlsxName)
         sheetList = xl.sheet_names
-        df = pd.read_excel(fileName, sheetList[0])
+        df = pd.read_excel(xlsxName, sheetList[0])
         if df.size == 0:
             return
         df.fillna('', inplace=True)
@@ -52,10 +56,11 @@ class App(QtWidgets.QMainWindow, layout.Ui_MainWindow):
                 tableItem = QtWidgets.QTableWidgetItem(str(value))
                 self.tableWidget.setItem(row[0], col_index, tableItem)
 
-    def saveData(self, docxName):
+    def saveData(self):
         directory = QtWidgets.QFileDialog.getExistingDirectory(self, "Выберите место сохранения файлов")
         if directory:  # не продолжать выполнение, если пользователь не выбрал директорию
-            doc = DocxTemplate("шаблон.docx")
+            doc = DocxTemplate(f"{docxPath}") # нужно передать путь к шаблону
+            print(directory)
             print(self.tableWidget.rowCount())
             print(self.tableWidget.columnCount())
             for j in range(self.tableWidget.rowCount()):
@@ -63,7 +68,7 @@ class App(QtWidgets.QMainWindow, layout.Ui_MainWindow):
                     dictionaryTemplate[f"{tupleTemplate[i]}"] = self.tableWidget.item(j, i).text()
                     #dictionaryTemplate.update(i = self.tableWidget.item(j, i).text())
                 doc.render(dictionaryTemplate)
-                doc.save(f"{j + 1}_output.docx")   
+                doc.save(f"{directory}/{j + 1}_output.docx")   
 
 def main():
     app = QtWidgets.QApplication(sys.argv)  # Новый экземпляр QApplication
