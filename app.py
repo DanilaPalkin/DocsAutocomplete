@@ -14,8 +14,8 @@ class App(QtWidgets.QMainWindow, layout.Ui_MainWindow):
                 'JJJJ': None, 'KKKK': None, 'LLLL': None, 'MMMM': None, 'NNNN': None, 'OOOO': None, 'PPPP': None, 'QQQQ': None, 'RRRR': None,
                 'SSSS': None, 'TTTT': None, 'UUUU': None, 'VVVV': None, 'WWWW': None, 'XXXX': None, 'YYYY': None, 'ZZZZ': None }
     
-    docxPath = ""
-    xlsxPath = ""
+    docxPath = None
+    xlsxPath = None
     currentPage = 0
 
     def __init__(self):
@@ -31,17 +31,14 @@ class App(QtWidgets.QMainWindow, layout.Ui_MainWindow):
         self.docxPath, _ = QtWidgets.QFileDialog.getOpenFileName(self,"Выбрать шаблон", "","Документ Word (*.docx)")
         if self.docxPath:
             print(self.docxPath)
-            self.lineEdit_2.setText(QtCore.QFileInfo(self.docxPath).fileName())
-            self.lineEdit_2.textChanged = True
-            self.buttonStateChangeCheck()
+            self.label_2.setText(QtCore.QFileInfo(self.docxPath).fileName())
 
     def browseXlsx(self):
         self.xlsxPath, _ = QtWidgets.QFileDialog.getOpenFileName(self,"Выбрать базу данных", "","Книга Excel (*.xlsx)")
         if self.xlsxPath:
             print(self.xlsxPath)
             self.currentPage = 0
-            self.lineEdit_3.setText(QtCore.QFileInfo(self.xlsxPath).fileName())
-            self.lineEdit_3.textChanged = True
+            self.label_3.setText(QtCore.QFileInfo(self.xlsxPath).fileName())
             self.buttonStateChangeCheck()
             self.loadExcelData()
 
@@ -54,7 +51,6 @@ class App(QtWidgets.QMainWindow, layout.Ui_MainWindow):
         self.loadExcelData()
 
     def loadExcelData(self):
-        #df = pd.read_excel(fileName, QtCore.QFileInfo(fileName).fileName())
         xl = pd.ExcelFile(self.xlsxPath)
         sheetList = xl.sheet_names
 
@@ -68,7 +64,9 @@ class App(QtWidgets.QMainWindow, layout.Ui_MainWindow):
         if df.size == 0:
             self.label.setText("Пустая страница!")
             self.tableWidget.clear()
+            self.pushButton_3.setEnabled(0)
             return
+        else: self.buttonStateChangeCheck()
         df.fillna('', inplace=True)
         self.tableWidget.setRowCount(df.shape[0])
         self.tableWidget.setColumnCount(df.shape[1])
@@ -91,12 +89,11 @@ class App(QtWidgets.QMainWindow, layout.Ui_MainWindow):
             for j in range(self.tableWidget.rowCount()):
                 for i in range(self.tableWidget.columnCount()):
                     self.dictionaryTemplate[f"{self.tupleTemplate[i]}"] = self.tableWidget.item(j, i).text()
-                    #dictionaryTemplate.update(i = self.tableWidget.item(j, i).text())
                 doc.render(self.dictionaryTemplate)
                 doc.save(f"{directory}/{j + 1}_output.docx")
     
     def buttonStateChangeCheck(self):
-        if (self.lineEdit_2.textChanged == True) and (self.lineEdit_3.textChanged == True):
+        if (self.docxPath != None) and (self.xlsxPath != None):
             self.pushButton_3.setEnabled(1)
             self.pushButton_4.setEnabled(1)
             self.pushButton_5.setEnabled(1)
