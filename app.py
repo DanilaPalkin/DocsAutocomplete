@@ -26,12 +26,14 @@ class App(QtWidgets.QMainWindow, layout.Ui_MainWindow):
         self.pushButton_3.clicked.connect(self.saveData)
         self.pushButton_4.clicked.connect(self.pageBack)
         self.pushButton_5.clicked.connect(self.pageForward)
+        self.lineEdit.textChanged.connect(self.search)
 
     def browseDocx(self):
         self.docxPath, _ = QtWidgets.QFileDialog.getOpenFileName(self,"Выбрать шаблон", "","Документ Word (*.docx)")
         if self.docxPath:
             print(self.docxPath)
             self.label_2.setText(QtCore.QFileInfo(self.docxPath).fileName())
+            self.buttonStateChangeCheck()
 
     def browseXlsx(self):
         self.xlsxPath, _ = QtWidgets.QFileDialog.getOpenFileName(self,"Выбрать базу данных", "","Книга Excel (*.xlsx)")
@@ -39,8 +41,8 @@ class App(QtWidgets.QMainWindow, layout.Ui_MainWindow):
             print(self.xlsxPath)
             self.currentPage = 0
             self.label_3.setText(QtCore.QFileInfo(self.xlsxPath).fileName())
-            self.buttonStateChangeCheck()
             self.loadExcelData()
+            self.buttonStateChangeCheck()
 
     def pageBack(self):
         self.currentPage -= 1
@@ -63,6 +65,8 @@ class App(QtWidgets.QMainWindow, layout.Ui_MainWindow):
         self.label.setText(sheetList[self.currentPage])
         if df.size == 0:
             self.label.setText("Пустая страница!")
+            self.tableWidget.setRowCount(0)
+            self.tableWidget.setColumnCount(0)
             self.tableWidget.clear()
             self.pushButton_3.setEnabled(0)
             return
@@ -93,10 +97,13 @@ class App(QtWidgets.QMainWindow, layout.Ui_MainWindow):
                 doc.save(f"{directory}/{j + 1}_output.docx")
     
     def buttonStateChangeCheck(self):
-        if (self.docxPath != None) and (self.xlsxPath != None):
+        if (self.docxPath != None) and (self.xlsxPath != None) and (self.tableWidget.rowCount() != 0):
             self.pushButton_3.setEnabled(1)
             self.pushButton_4.setEnabled(1)
             self.pushButton_5.setEnabled(1)
+
+    def search(self):
+        return
 
 def main():
     app = QtWidgets.QApplication(sys.argv)  # Новый экземпляр QApplication
