@@ -31,14 +31,12 @@ class App(QtWidgets.QMainWindow, layout.Ui_MainWindow):
     def browseDocx(self):
         self.docxPath, _ = QtWidgets.QFileDialog.getOpenFileName(self,"Выбрать шаблон", "","Документ Word (*.docx)")
         if self.docxPath:
-            print(self.docxPath)
             self.label_2.setText(QtCore.QFileInfo(self.docxPath).fileName())
             self.buttonStateChangeCheck()
 
     def browseXlsx(self):
         self.xlsxPath, _ = QtWidgets.QFileDialog.getOpenFileName(self,"Выбрать базу данных", "","Книга Excel (*.xlsx)")
         if self.xlsxPath:
-            print(self.xlsxPath)
             self.currentPage = 0
             self.label_3.setText(QtCore.QFileInfo(self.xlsxPath).fileName())
             self.loadExcelData()
@@ -87,14 +85,17 @@ class App(QtWidgets.QMainWindow, layout.Ui_MainWindow):
         directory = QtWidgets.QFileDialog.getExistingDirectory(self, "Выберите место сохранения файлов")
         if directory:  # не продолжать выполнение, если пользователь не выбрал директорию
             doc = DocxTemplate(f"{self.docxPath}") # нужно передать путь к шаблону
-            print(directory)
-            print(self.tableWidget.rowCount())
-            print(self.tableWidget.columnCount())
+
             for j in range(self.tableWidget.rowCount()):
+                k = 0
                 for i in range(self.tableWidget.columnCount()):
-                    self.dictionaryTemplate[f"{self.tupleTemplate[i]}"] = self.tableWidget.item(j, i).text()
-                doc.render(self.dictionaryTemplate)
-                doc.save(f"{directory}/{j + 1}_output.docx")
+                    if self.tableWidget.item(j, i).isSelected():
+                        self.dictionaryTemplate[f"{self.tupleTemplate[k]}"] = self.tableWidget.item(j, i).text()
+                        k += 1
+                if self.dictionaryTemplate["AAAA"] != None:
+                    doc.render(self.dictionaryTemplate)
+                    doc.save(f"{directory}/{j + 1}_output.docx")
+                self.dictionaryTemplate = self.dictionaryTemplate.fromkeys(self.dictionaryTemplate, None)
     
     def buttonStateChangeCheck(self):
         if (self.docxPath != None) and (self.xlsxPath != None) and (self.tableWidget.rowCount() != 0):
