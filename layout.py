@@ -22,6 +22,7 @@ class Ui_MainWindow(object):
         self.tableWidget.setObjectName("tableWidget")
         self.tableWidget.setColumnCount(0)
         self.tableWidget.setRowCount(0)
+        self.tableWidget.setSortingEnabled(False)
         self.gridLayout.addWidget(self.tableWidget, 2, 0, 1, 6)
         self.pushButton_3 = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton_3.setEnabled(False)

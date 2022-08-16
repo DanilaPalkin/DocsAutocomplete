@@ -39,6 +39,9 @@ class App(QtWidgets.QMainWindow, layout.Ui_MainWindow):
         if self.xlsxPath:
             self.currentPage = 0
             self.label_3.setText(QtCore.QFileInfo(self.xlsxPath).fileName())
+            self.tableWidget.setRowCount(0) # необходимо, когда
+            self.tableWidget.setColumnCount(0) # загружаешь новую таблицу
+            self.tableWidget.clear() # при self.tableWidget.setSortingEnabled(True)
             self.loadExcelData()
             self.buttonStateChangeCheck()
 
