@@ -1,9 +1,13 @@
 import sys, os
-import layout
+import layout, infowindow
 from PyQt6 import QtWidgets, QtCore
 import pandas as pd
 from docxtpl import DocxTemplate
 
+class InfoWindow(QtWidgets.QWidget, infowindow.Ui_Form):
+    def __init__(self):
+        super().__init__()
+        self.setupUi(self)
 
 class App(QtWidgets.QMainWindow, layout.Ui_MainWindow):
     tupleTemplate = ('AAAA', 'BBBB', 'CCCC', 'DDDD', 'EEEE', 'FFFF', 'GGGG', 'HHHH', 'IIII',
@@ -26,7 +30,12 @@ class App(QtWidgets.QMainWindow, layout.Ui_MainWindow):
         self.pushButton_3.clicked.connect(self.saveData)
         self.pushButton_4.clicked.connect(self.pageBack)
         self.pushButton_5.clicked.connect(self.pageForward)
+        self.pushButton_6.clicked.connect(self.on_pushButton_clicked)
+        self.dialog = InfoWindow()
         self.lineEdit.textChanged.connect(self.search)
+
+    def on_pushButton_clicked(self):
+        self.dialog.show()
 
     def browseDocx(self):
         self.docxPath, _ = QtWidgets.QFileDialog.getOpenFileName(self,"Выбрать шаблон", "","Документ Word (*.docx)")
