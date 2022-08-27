@@ -30,11 +30,11 @@ class App(QtWidgets.QMainWindow, layout.Ui_MainWindow):
         self.pushButton_3.clicked.connect(self.saveData)
         self.pushButton_4.clicked.connect(self.pageBack)
         self.pushButton_5.clicked.connect(self.pageForward)
-        self.pushButton_6.clicked.connect(self.on_pushButton_clicked)
-        self.dialog = InfoWindow()
+        self.pushButton_6.clicked.connect(self.showInfo)
         self.lineEdit.textChanged.connect(self.search)
 
-    def on_pushButton_clicked(self):
+    def showInfo(self):
+        self.dialog = InfoWindow()
         self.dialog.show()
 
     def browseDocx(self):
@@ -115,8 +115,19 @@ class App(QtWidgets.QMainWindow, layout.Ui_MainWindow):
             self.pushButton_4.setEnabled(1)
             self.pushButton_5.setEnabled(1)
 
-    def search(self):
-        return
+    def search(self, string):
+        # очистка текущего выбора
+        self.tableWidget.setCurrentItem(None)
+
+        if not string:
+            # пустая строка, не искать
+            return
+
+        matchingItems = self.tableWidget.findItems(string, QtCore.Qt.MatchFlag.MatchContains)
+        if matchingItems:
+            for item in matchingItems:
+                item.setSelected(True)
+        
 
 def main():
     app = QtWidgets.QApplication(sys.argv)  # Новый экземпляр QApplication
