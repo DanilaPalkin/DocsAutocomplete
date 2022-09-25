@@ -101,10 +101,11 @@ class App(QtWidgets.QMainWindow, layout.Ui_MainWindow):
             for j in range(self.tableWidget.rowCount()):
                 k = 0
                 for i in range(self.tableWidget.columnCount()):
-                    if self.tableWidget.item(j, i).isSelected():
+                    # работаем только с ячейками, которые выделены и не спрятаны фильтром поиска
+                    if self.tableWidget.item(j, i).isSelected() and not self.tableWidget.isRowHidden(j):
                         self.dictionaryTemplate[f"{self.tupleTemplate[k]}"] = self.tableWidget.item(j, i).text()
                         k += 1
-                if self.dictionaryTemplate["AAAA"] != None:
+                if self.dictionaryTemplate["AAAA"] != None: # убедимся, что контекст не пустой
                     doc.render(self.dictionaryTemplate)
                     doc.save(f"{directory}/{j + 1}_output.docx")
                 self.dictionaryTemplate = self.dictionaryTemplate.fromkeys(self.dictionaryTemplate, None)
@@ -120,13 +121,19 @@ class App(QtWidgets.QMainWindow, layout.Ui_MainWindow):
         self.tableWidget.setCurrentItem(None)
 
         if not string:
-            # пустая строка, не искать
+            # пустая строка, не искать, показать всю таблицу
+            for j in range(self.tableWidget.rowCount()):
+                self.tableWidget.showRow(j)
             return
+
+        # спрячем таблицу, будем показывать только подходящие под фильтр строки
+        for j in range(self.tableWidget.rowCount()):
+                self.tableWidget.hideRow(j)
 
         matchingItems = self.tableWidget.findItems(string, QtCore.Qt.MatchFlag.MatchContains)
         if matchingItems:
             for item in matchingItems:
-                item.setSelected(True)
+                self.tableWidget.showRow(item.row())
         
 
 def main():
