@@ -3,8 +3,9 @@ import layout, infowindow
 from PyQt6 import QtWidgets, QtCore
 import pandas as pd
 from docxtpl import DocxTemplate
+import inflector
 
-class InfoWindow(QtWidgets.QWidget, infowindow.Ui_Form):
+class InfoWindow(QtWidgets.QDialog, infowindow.Ui_Form):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
@@ -35,6 +36,7 @@ class App(QtWidgets.QMainWindow, layout.Ui_MainWindow):
 
     def showInfo(self):
         self.dialog = InfoWindow()
+        self.dialog.setModal(True)
         self.dialog.show()
 
     def browseDocx(self):
@@ -105,16 +107,19 @@ class App(QtWidgets.QMainWindow, layout.Ui_MainWindow):
                     if self.tableWidget.item(j, i).isSelected() and not self.tableWidget.isRowHidden(j):
                         self.dictionaryTemplate[f"{self.tupleTemplate[k]}"] = self.tableWidget.item(j, i).text()
                         k += 1
+
                 if self.dictionaryTemplate["AAAA"] != None: # убедимся, что контекст не пустой
+                    if self.checkBox.isChecked():
+                        inflector.inflect(self.dictionaryTemplate) # склоняем первые три поля
                     doc.render(self.dictionaryTemplate)
                     doc.save(f"{directory}/{j + 1}_output.docx")
                 self.dictionaryTemplate = self.dictionaryTemplate.fromkeys(self.dictionaryTemplate, None)
     
     def buttonStateChangeCheck(self):
         if (self.docxPath != None) and (self.xlsxPath != None) and (self.tableWidget.rowCount() != 0):
-            self.pushButton_3.setEnabled(1)
-            self.pushButton_4.setEnabled(1)
-            self.pushButton_5.setEnabled(1)
+            self.pushButton_3.setEnabled(True)
+            self.pushButton_4.setEnabled(True)
+            self.pushButton_5.setEnabled(True)
 
     def search(self, string):
         # очистка текущего выбора
@@ -138,6 +143,7 @@ class App(QtWidgets.QMainWindow, layout.Ui_MainWindow):
 
 def main():
     app = QtWidgets.QApplication(sys.argv)  # Новый экземпляр QApplication
+    app.setStyle('Fusion')
     window = App()
     window.show()
     app.exec()
