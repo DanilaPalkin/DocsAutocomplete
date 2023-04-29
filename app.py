@@ -17,7 +17,8 @@ class App(QtWidgets.QMainWindow, layout.Ui_MainWindow):
 
     dictionaryTemplate = { 'AAAA': None, 'BBBB': None, 'CCCC': None, 'DDDD': None, 'EEEE': None, 'FFFF': None, 'GGGG': None, 'HHHH': None, 'IIII': None,
                 'JJJJ': None, 'KKKK': None, 'LLLL': None, 'MMMM': None, 'NNNN': None, 'OOOO': None, 'PPPP': None, 'QQQQ': None, 'RRRR': None,
-                'SSSS': None, 'TTTT': None, 'UUUU': None, 'VVVV': None, 'WWWW': None, 'XXXX': None, 'YYYY': None, 'ZZZZ': None }
+                'SSSS': None, 'TTTT': None, 'UUUU': None, 'VVVV': None, 'WWWW': None, 'XXXX': None, 'YYYY': None, 'ZZZZ': None,
+                'AA': None, 'BB': None, 'CC': None }
     
     docxPath = None
     xlsxPath = None
@@ -110,9 +111,9 @@ class App(QtWidgets.QMainWindow, layout.Ui_MainWindow):
 
                 if self.dictionaryTemplate["AAAA"] != None: # убедимся, что контекст не пустой
                     if self.checkBox.isChecked():
-                        inflector.inflect(self.dictionaryTemplate) # склоняем первые три поля
+                        inflector.inflect(self.dictionaryTemplate) # склоняем копии первых трёх полей
                     doc.render(self.dictionaryTemplate)
-                    doc.save(f"{directory}/{j + 1}_output.docx")
+                    doc.save(f"{directory}/{self.dictionaryTemplate['AAAA']} {self.dictionaryTemplate['BBBB']}.docx")
                 self.dictionaryTemplate = self.dictionaryTemplate.fromkeys(self.dictionaryTemplate, None)
     
     def buttonStateChangeCheck(self):
